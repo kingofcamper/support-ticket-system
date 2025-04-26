@@ -1,0 +1,12 @@
+const express = require("express");
+const router = express.Router();
+const ticketController = require("../controllers/ticketController");
+const { authenticate } = require("../middlewares/authMiddleware");
+
+// All routes protected
+router.post("/", authenticate, ticketController.createTicket);
+router.put("/:ticketId", authenticate, ticketController.updateTicket);
+router.put("/:ticketId/close", authenticate, ticketController.closeTicket);
+router.get("/my-tickets", authenticate, ticketController.getMyTickets);
+
+module.exports = router;
