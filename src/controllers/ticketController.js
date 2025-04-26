@@ -111,3 +111,42 @@ exports.getMyTickets = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// Assign Agent to Ticket (Only Admin)
+exports.assignAgent = async (req, res) => {
+  const { ticketId } = req.params;
+  const { agentId } = req.body;
+
+  try {
+    // Find the ticket by ID
+    const ticket = await Ticket.findByPk(ticketId);
+
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    // Ensure the user is an admin before allowing agent assignment
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    // Assign the agent to the ticket
+    ticket.agentId = agentId;
+    await ticket.save();
+
+    // Optionally, you could notify the assigned agent via email
+    const agent = await User.findByPk(agentId);
+    if (agent && agent.email) {
+      await sendEmail(
+        agent.email,
+        "You Have Been Assigned a Ticket",
+        `Hello ${agent.name},\n\nYou have been assigned a new ticket: "${ticket.title}".\n\nPlease review it as soon as possible.\n\nThank you,\nSupport Team`
+      );
+    }
+
+    res.json({ message: "Agent assigned to ticket", ticket });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -26,6 +26,15 @@ const Ticket = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    agentId: {
+      // New field to store the assigned agent's ID
+      type: DataTypes.INTEGER,
+      allowNull: true, // Can be null until assigned
+      references: {
+        model: "users", // Refers to the 'users' table
+        key: "id", // 'id' field of the 'users' table
+      },
+    },
   },
   {
     tableName: "tickets",
@@ -35,6 +44,7 @@ const Ticket = sequelize.define(
 // Correct association (WITHOUT requiring User directly)
 Ticket.associate = (models) => {
   Ticket.belongsTo(models.User, { as: "creator", foreignKey: "userId" });
+  Ticket.belongsTo(models.User, { as: "assignedAgent", foreignKey: "agentId" });
 };
 
 module.exports = Ticket;
