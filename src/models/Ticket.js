@@ -22,6 +22,11 @@ const Ticket = sequelize.define(
       allowNull: false,
       defaultValue: "open",
     },
+    priority: {
+      type: DataTypes.ENUM("low", "medium", "urgent"),
+      allowNull: false,
+      defaultValue: "low",
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
